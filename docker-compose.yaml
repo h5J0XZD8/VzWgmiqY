@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  app:
+    image: nsmusics
+    container_name: ${APP_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      - mongodb
+
+  web:
+    image: nsmusics-go
+    container_name: ${WEB_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - mongodb
+    volumes:
+      - "${MUSIC_DATA_PATH}:/container/data"
+
+  mongodb:
+    image: mongo:6.0
+    container_name: ${MONGO_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASS}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - "${MONGO_DATA_PATH}:/data/db"
